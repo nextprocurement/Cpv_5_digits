@@ -9,53 +9,64 @@ The API is built using **Flask**, containerized with **Docker**, and can be depl
 
 ## Features ✅
 - 📡 **REST API** for predicting CPV codes.
-- 🧠 **Powered by OpenAI's GPT-4o-mini**.
-- 📄 **Supports single and batch text inputs**.
-- 🔄 **Retry mechanism** for handling rate limits.
+- 🧐 **Powered by OpenAI's GPT-4o-mini**.
+- 🗄 **Supports single and batch text inputs**.
+- 💡 **Retry mechanism** for handling rate limits.
 - 📜 **Logging to both console and file**.
 - 🐳 **Dockerized for easy deployment**.
+- 🔑 **Uses `.env` file for API key management**.
 
 ---
 
-## 📂 Project Structure
+## 💂️ Security Note
+**Never share your OpenAI API key publicly.**
+This project uses a `.env` file to load the `OPENAI_API_KEY` securely.
+
+---
+
+## 💂️ Project Structure
 ```
 .
 ├── app
 │   ├── main.py               # Main Flask application
 │   ├── requirements.txt       # Python dependencies
 │   ├── logs                   # Directory for log files
-│   ├── Dockerfile             # Docker setup
-│   ├── config.py              # Configuration settings (optional)
-│   ├── __init__.py            # Package initialization (if needed)
-│   └── tests                  # Unit tests (if needed)
 │
+├── Dockerfile                 # Docker setup
 ├── docker-compose.yml          # Docker Compose configuration
-├── README.md                   # Project documentation
-└── .gitignore                  # Ignore unnecessary files
+├── .env                       # Environment variables (API key)
+├── .gitignore                  # Ignore unnecessary files
+└── Readme.md                   # Project documentation
 ```
 
 ---
 
 ## 🛠 Installation & Setup
 
-### 1️⃣ **Clone the Repository**
+### 1⃣ **Clone the Repository**
 ```sh
 git clone https://github.com/your-repo/cpv-prediction-api.git
 cd cpv-prediction-api
 ```
 
-### 2️⃣ **Set Up Virtual Environment (Optional)**
+### 2⃣ **Create `.env` File**
+Create a `.env` file in the root directory with the following content:
+```
+OPENAI_API_KEY=sk-YOUR-OPENAI-API-KEY
+```
+
+### 3⃣ **Set Up Virtual Environment (Optional)**
 ```sh
 python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
-### 3️⃣ **Install Dependencies**
+### 4⃣ **Install Dependencies**
 ```sh
 pip install -r app/requirements.txt
 ```
 
-### 4️⃣ **Run the API Locally**
+### 5⃣ **Run the API Locally**
 ```sh
 python app/main.py
 ```
@@ -64,16 +75,18 @@ python app/main.py
 ---
 
 ## 🐳 Run with Docker
-### **1️⃣ Build the Docker Image**
+
+### **1⃣ Build the Docker Image**
 ```sh
 docker build -t cpv-api .
 ```
-### **2️⃣ Run the API in a Container**
+
+### **2⃣ Run the API in a Container**
 ```sh
-docker run -p 5000:5000 cpv-api
+docker run --env-file .env -p 5000:5000 cpv-api
 ```
 
-### **3️⃣ Run with Docker Compose**
+### **3⃣ Run with Docker Compose**
 ```sh
 docker-compose up --build
 ```
@@ -83,13 +96,11 @@ docker-compose up --build
 ## 🔥 API Usage
 ### **Request Format**
 The API expects a **POST request** with a JSON payload containing:
-- `api_key`: Your OpenAI API key.
 - `texts`: A **list** of text descriptions (or a single string) to predict CPV codes.
 
 ### **Example Request (cURL)**
 ```sh
 curl -X POST "http://localhost:5000/predict" -H "Content-Type: application/json" -d '{
-  "api_key": "sk-YOUR-OPENAI-KEY",
   "texts": ["Servicios de mantenimiento de parques", "Reparación de carreteras"]
 }'
 ```
@@ -112,7 +123,7 @@ curl -X POST "http://localhost:5000/predict" -H "Content-Type: application/json"
 
 ## 📜 Logging
 - All logs are stored in the **`app/logs`** directory.
-- You can check logs in real-time while running the API.
+- You can check logs in real-time while running the API:
 
 ```sh
 tail -f app/logs/cpv_api.log
@@ -122,29 +133,21 @@ tail -f app/logs/cpv_api.log
 
 ## 🧪 Testing the API
 To verify the API is working correctly, you can:
-1. **Use Postman**:  
-   - Set the **method** to `POST`.  
-   - Enter `http://localhost:5000/predict` as the **URL**.  
-   - Add a **JSON body**:
-     ```json
-     {
-       "api_key": "sk-YOUR-OPENAI-KEY",
-       "texts": ["Servicios de mantenimiento de parques", "Reparación de carreteras"]
-     }
-     ```
-   - Click **Send** and check the response.
 
-2. **Use cURL** (from the terminal):
-   ```sh
-   curl -X POST "http://localhost:5000/predict" -H "Content-Type: application/json" -d '{
-     "api_key": "sk-YOUR-OPENAI-KEY",
-     "texts": ["Servicios de mantenimiento de parques", "Reparación de carreteras"]
-   }'
-   ```
+### **Use Postman:**
+- Set the **method** to `POST`.
+- Enter `http://localhost:5000/predict` as the **URL**.
+- Add a **JSON body**:
+  ```json
+  {
+    "texts": ["Servicios de mantenimiento de parques", "Reparación de carreteras"]
+  }
+  ```
+- Click **Send** and check the response.
 
 ---
 
-## 🔄 Stopping & Removing Containers
+## 💡 Stopping & Removing Containers
 If you need to stop the running Docker containers:
 ```sh
 docker-compose down
@@ -153,3 +156,4 @@ To remove all Docker containers and images related to this project:
 ```sh
 docker system prune -a
 ```
+

@@ -9,6 +9,8 @@ COPY app/requirements.txt /app/requirements.txt
 
 COPY app/ app/
 
+COPY .env .
+
 # Install the required Python packages
 RUN pip install --no-cache-dir -r requirements.txt
 

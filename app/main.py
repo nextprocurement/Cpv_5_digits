@@ -1,5 +1,4 @@
 import logging
-import json
 import os
 import time
 from flask import Flask, request, jsonify
@@ -42,23 +41,25 @@ max_retries = 3  # Maximum number of retries before failing
 # ✅ Function to Predict CPV Code
 # -----------------------------
 
-def get_cpv_code(objective_text, api_key):
+def get_cpv_code(objective_text):
     """
     Queries the OpenAI model to predict the CPV code from a given text.
     
     - objective_text: The input text to predict the CPV code.
-    - api_key: The API key to authenticate the OpenAI request.
 
     Returns:
     - A 5-digit CPV code if the prediction is successful.
     - None if the model fails or the prediction is invalid.
     """
 
-    # Set the OpenAI API key for the session
-    os.environ["OPENAI_API_KEY"] = api_key
+    # Get API key from environment variable
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        raise ValueError("La variable de entorno 'OPENAI_API_KEY' no está configurada.")
 
     # Initialize the OpenAI model
-    model = ChatOpenAI(model="gpt-4o-mini")
+    model = ChatOpenAI(model="gpt-4o-mini", openai_api_key=api_key)
 
     attempt = 0  # Attempt counter
 
@@ -123,7 +124,6 @@ def predict():
     API endpoint to predict CPV codes.
 
     - Expects a JSON payload with:
-        - "api_key": The OpenAI API key.
         - "texts": A list of texts to process.
 
     - Returns a JSON response with the CPV codes.
@@ -133,10 +133,9 @@ def predict():
     data = request.get_json()
 
     # Validate required parameters
-    if not data or "api_key" not in data or "texts" not in data:
-        return jsonify({"error": "Missing required fields: 'api_key' and 'texts'"}), 400
+    if not data or "texts" not in data:
+        return jsonify({"error": "Missing required field: 'texts'"}), 400
 
-    api_key = data["api_key"]
     texts = data["texts"]
 
     # Convert to list if only a single text is provided
@@ -145,7 +144,7 @@ def predict():
 
     results = []
     for text in texts:
-        cpv_code = get_cpv_code(text, api_key)
+        cpv_code = get_cpv_code(text)
         results.append({"text": text, "cpv_code": cpv_code})
 
     return jsonify(results)
